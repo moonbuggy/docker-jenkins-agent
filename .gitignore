@@ -1,0 +1,5 @@
+.build_data
+.qemu_static
+_dummyfile
+*.bak
+

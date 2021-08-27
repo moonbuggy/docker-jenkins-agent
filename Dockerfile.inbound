@@ -1,0 +1,31 @@
+ARG JRE_VERSION='11.0.11_9'
+ARG JRE_OS='debianslim'
+ARG FROM_IMAGE="moonbuggy2000/jenkins-agent:agent-${JRE_VERSION}-{$JRE_OS}"
+
+ARG REMOTING_VERSION="4.10"
+
+ARG TARGET_ARCH_TAG="amd64"
+
+#ARG JENKINS_USER="jenkins"
+#ARG JENKINS_GROUP="jenkins"
+#ARG PUID="1000"
+#ARG GUID="1000"
+
+#ARG AGENT_WORKDIR="/home/${JENKINS_USER}/agent"
+
+## get files we need
+#
+FROM moonbuggy2000/fetcher:latest AS fetcher
+
+WORKDIR /fetcher_root/usr/local/bin
+RUN wget -qO jenkins-agent https://github.com/jenkinsci/docker-inbound-agent/raw/master/jenkins-agent \
+  && chmod a+x jenkins-agent \
+  && ln -sf jenkins-agent jenkins-slave
+
+## build the image
+#
+FROM "${FROM_IMAGE}"
+
+COPY --from=fetcher /fetcher_root/ /
+
+ENTRYPOINT ["/usr/local/bin/jenkins-agent"]
